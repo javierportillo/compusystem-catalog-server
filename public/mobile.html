@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Productos</title>
+	<link rel="stylesheet" href="materialize.css">
+	<link href="materialicons.css"" rel="stylesheet">
+	<script src="materialize.js"></script>
+	<script src="axios.js"></script>
+	<script src="vue.js"></script>
+	<style>
+		html, body, #app { height: 100%; }
+		body { background: #F0F0FF; }
+		.flex { display: flex; }
+		.column { flex-direction: column; }
+		.flex-0 { flex: 0 }
+		.flex-1 { flex: 1 }
+		.mx-0 {
+			margin-left: 0;
+			margin-right: 0;
+		}
+		.my-0 {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+		.mr-1 {
+			margin-right: 1rem;
+		}
+		.pa-0 {
+			padding: 0 !important;
+		}
+		.relative { position: relative; }
+		.absolute { position: absolute; }
+		.right { right: 0; }
+		.scroll-y-auto { overflow-y: auto; }
+		.maxh-unset { max-height: unset !important; }
+	</style>
+</head>
+<body>
+	<div id="app" class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
+		<div class="row flex-0 mx-0 my-0">
+			<div class="input-field">
+				<i class="material-icons prefix" @click="search">search</i>
+				<input v-model="busqueda" type="text" id="busqueda" @keypress.enter="search">
+				<label for="busqueda">Buscar</label>
+			</div>
+		</div>
+		<div class="row flex-1 scroll-y-auto my-0 mx-0">
+			<ul class="collection my-0">
+				<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
+					<img v-if="producto.foto.length" :src="`/img/${producto.foto[0]}`" class="circle">
+					<span class="title">{{ producto.nombre }}</span>
+					<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
+					<p><b>Estado: {{ producto.estado }}</b></p>
+					<p style="padding-top: 10px">{{ producto.descripcion }}</p>
+				</li>
+			</ul>
+		</div>
+		<div id="fotos" class="modal bottom-sheet maxh-unset">
+			<div class="modal-content pa-0">
+				<div id="carrusel" class="carousel carousel-slider">
+					<a v-for="(foto, idx) of actual.foto" class="carousel-item" :href="`#${idx}`">
+						<img :src="`/img/${foto}`">
+					</a>
+				</div>
+				<div style="padding: 0 10px" class="relative">
+					<button class="waves-effect waves-teal btn-flat absolute mr-1 right" @click="closeModal">x</button>
+					<h5>{{ actual.nombre }}</h5>
+					<h5>$ {{ Number(actual.precio).toFixed(2) }}</h5>
+					<p><b>Estado: {{ actual.estado }}</b></p>
+					<p>{{ actual.descripcion }}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				productos: [],
+				busqueda: '',
+				pagina: 0,
+				actual: {},
+			},
+			mounted: function () {
+				this.reset()
+				var modal = document.getElementById('fotos')
+				var instances = M.Modal.init(modal)
+			},
+			methods: {
+				reset: function() {
+					axios.get('/api/producto').then(function (lista) {
+						vm.productos = lista.data
+					})
+				},
+				next: function() {
+					this.pagina += 1
+					this.search()
+				},
+				search: function() {
+					this.pagina = 0
+					if (!this.busqueda) {
+						this.reset()
+						return
+					}
+					axios.get('/api/producto/search', {
+						params: {
+							name: this.busqueda,
+							page: this.pagina,
+						},
+					}).then(function(lista) {
+						if (lista.data.success === false) { return }
+						lista.data.forEach(p => vm.productos.push(p))
+					})
+				},
+				verFotos(producto) {
+					this.actual = producto
+					var elemmodal = document.getElementById('fotos')
+					var modal = M.Modal.getInstance(elemmodal)
+					modal.open()
+					Vue.nextTick(function () {
+						var elems = document.getElementById('carrusel');
+						var carrusel = M.Carousel.init(elems, {
+							fullWidth: true,
+							indicators: true
+						})
+					})
+				},
+				closeModal() {
+					var elemmodal = document.getElementById('fotos')
+					var modal = M.Modal.getInstance(elemmodal)
+					modal.close()
+				}
+			},
+		})
+	</script>
+</body>
+</html>

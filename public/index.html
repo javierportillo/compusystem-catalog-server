@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<script src="axios.js"></script>
+	<script src="vue.js"></script>
+	<title>Catálogo</title>
+	<style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+			background: #F0F0F0;
+		}
+		fieldset {
+			background: white;
+		}
+		legend {
+			margin: 0 auto;
+			font-size: 2rem;
+			background: black;
+			color: white;
+			padding: 3px 6px;
+		}
+		.formulario {
+			width: 100%;
+			max-width: 600px;
+			margin: 20px auto;
+		}
+		.control {
+			display: flex;
+			width: 100%;
+			margin-bottom: 10px;
+		}
+		.control > label {
+			flex: 0;
+			flex-basis: 100px;
+		}
+		.control > input, .control > select {
+			flex: 1;
+		}
+		.control > select {
+			padding: 3px;
+		}
+		.products {
+			width: 100%;
+			max-width: 600px;
+			margin: 20px auto;	
+		}
+		.products > table {
+			width: 100%;
+			background: white;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<form class="formulario" @submit.prevent="config">
+		<fieldset>
+			<legend>Detalles de Contacto</legend>
+			<div class="control">
+				<label for="telefono">Teléfono</label>
+				<input v-model="contacto.telefono" type="text" id="telefono">
+			</div>
+			<div class="control">
+				<label for="facebook">Facebook</label>
+				<input v-model="contacto.facebook" type="text" id="facebook">
+			</div>
+			<div class="control">
+				<label for="twitter">Twitter</label>
+				<input v-model="contacto.twitter" type="text" id="twitter">
+			</div>
+			<div class="control">
+				<label for="correo">Correo</label>
+				<input v-model="contacto.correo" type="text" id="correo">
+			</div>
+			<div class="control">
+				<input type="submit" value="Cambiar">
+			</div>
+		</fieldset>
+	</form>
+	<form class="formulario" @submit.prevent="create">
+		<fieldset>
+			<legend>Crea un producto</legend>
+			<div class="control">
+				<label for="nombre">Nombre</label>
+				<input v-model="nuevo.nombre" type="text" id="nombre">
+			</div>
+			<div class="control">
+				<label for="precio">Precio</label>
+				<input v-model="nuevo.precio" type="number" id="precio">
+			</div>
+			<div class="control">
+				<label for="descripcion">Descripción</label>
+				<input v-model="nuevo.descripcion" type="text" id="descripcion">
+			</div>
+			<div class="control">
+				<label for="estado">Estado</label>
+				<select v-model="nuevo.estado" id="estado">
+					<option value="nuevo">Nuevo</option>
+					<option value="usado">Usado</option>
+				</select>
+			</div>
+			<div class="control">
+				<label for="foto">Fotografía</label>
+				<input type="file" id="foto" multiple>
+			</div>
+			<div class="control">
+				<input type="submit" value="Crear">
+			</div>
+		</fieldset>
+	</form>
+	<form class="formulario" @submit.prevent="buscar">
+		<fieldset>
+			<legend>Buscar</legend>
+			<div class="control">
+				<label for="bus_nombre">Nombre</label>
+				<input v-model="busqueda.nombre" type="search" id="bus_nombre">
+			</div>
+			<div class="control">
+				<input type="submit" value="Buscar">
+			</div>
+		</fieldset>
+	</form>
+	<div class="products">
+		<table border="1">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>nombre</th>
+					<th>precio</th>
+					<th>descripcion</th>
+					<th>estado</th>
+					<th>foto</th>
+					<th>eliminar</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(producto, idx) of products">
+					<td>{{ producto.id }}</td>
+					<td>{{ producto.nombre }}</td>
+					<td>$ {{ Number(producto.precio).toFixed(2) }}</td>
+					<td>{{ producto.descripcion }}</td>
+					<td>{{ producto.estado }}</td>
+					<td>
+						<img v-if="producto.foto && producto.foto.length" :src="`/img/${producto.foto[0]}`" style="width: 50px;">
+					</td>
+					<td>
+						<button style="color: red;" @click="eliminar(idx, producto)">X</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#app',
+		data: {
+			busqueda: {
+				nombre: '',
+			},
+			nuevo: {
+				nombre: '',
+				precio: 0,
+				descripcion: '',
+				estado: 'nuevo',
+			},
+			contacto: {
+				telefono: '',
+				facebook: '',
+				twitter: '',
+				correo: '',
+			},
+			products: [],
+		},
+		mounted: function () {
+			axios.get('/api/producto').then(function(lista) {
+				vm.products = lista.data
+			})
+			axios.get('/api/contacto').then(function (res) {
+				vm.contacto = res.data
+			})
+		},
+		methods: {
+			buscar: function() {
+				if (!vm.busqueda.nombre) {
+					axios.get('/api/producto').then(function(lista) {
+						vm.products = lista.data
+					})
+					return
+				}
+				axios.get('/api/producto/search', {
+					params: {
+						name: vm.busqueda.nombre,
+					},
+				}).then(function(lista) {
+					if (lista.data.success === false) { return }
+					vm.products = lista.data
+				})
+			},
+			eliminar: function(idx, producto) {
+				axios.delete('/api/producto/' + producto.id).then(function (res) {
+					if (!res.data.success) { return }
+					Vue.delete(vm.products, idx)
+				})
+			},
+			config: function () {
+				axios.post('/api/contacto', this.contacto).then(function (res) {
+					if (!res.data.success) {
+						alert('No se pudo actualizar los datos de contacto.')
+						return
+					}
+					alert('Cambiado exitosamente')
+				})
+			},
+			create: function() {
+				if (!this.nuevo.nombre
+					|| !this.nuevo.precio
+					|| !this.nuevo.descripcion
+					|| !this.nuevo.estado
+				) { return }
+				axios.post('/api/producto', this.nuevo).then(function (resCreate) {
+					if (!resCreate.data.success) {
+						alert('No se pudo crear el producto.')
+					}
+					var file = document.getElementById('foto')
+					if (!file.files.length) { return }
+					var formData = new FormData()
+					for (var i = 0; i < file.files.length; i++) {
+						formData.append('foto', file.files[i])
+					}
+					axios.post(`/api/producto/${resCreate.data.id}/foto`, formData, {
+						headers: {
+							'Content-Type': 'multipart/form-data',
+						},
+					}).then(function (resFoto) {
+						if (!resFoto.data.success) {
+							alert('Hubo un problema al subir la foto del producto.')
+						}
+						vm.products.push({
+							id: resCreate.data.id,
+							nombre: vm.nuevo.nombre,
+							precio: vm.nuevo.precio,
+							descripcion: vm.nuevo.descripcion,
+							estado: vm.nuevo.estado,
+							foto: resFoto.data.fotos,
+						})
+						vm.nuevo.nombre = ''
+						vm.nuevo.precio = 0
+						vm.nuevo.descripcion = ''
+						var file = document.getElementById('foto')
+						file.value = ''
+					})
+				})
+			},
+		},
+	})
+</script>
+</body>
+</html>
