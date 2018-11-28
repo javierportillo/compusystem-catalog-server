@@ -111,10 +111,10 @@
 						},
 					}).then(function(lista) {
 						if (lista.data.success === false) { return }
-						lista.data.forEach(p => vm.productos.push(p))
+						lista.data.forEach(function (p) { vm.productos.push(p) })
 					})
 				},
-				verFotos(producto) {
+				verFotos: function(producto) {
 					this.actual = producto
 					var elemmodal = document.getElementById('fotos')
 					var modal = M.Modal.getInstance(elemmodal)
@@ -127,7 +127,7 @@
 						})
 					})
 				},
-				closeModal() {
+				closeModal: function() {
 					var elemmodal = document.getElementById('fotos')
 					var modal = M.Modal.getInstance(elemmodal)
 					modal.close()
