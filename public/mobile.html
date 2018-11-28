@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Productos</title>
 	<link rel="stylesheet" href="materialize.css">
-	<link href="materialicons.css"" rel="stylesheet">
+	<link href="materialicons.css" rel="stylesheet">
 	<script src="materialize.js"></script>
 	<script src="axios.js"></script>
 	<script src="vue.js"></script>
@@ -49,7 +49,7 @@
 		<div class="row flex-1 scroll-y-auto my-0 mx-0">
 			<ul class="collection my-0">
 				<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
-					<img v-if="producto.foto.length" :src="`/img/${producto.foto[0]}`" class="circle">
+					<img v-if="producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
 					<span class="title">{{ producto.nombre }}</span>
 					<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
 					<p><b>Estado: {{ producto.estado }}</b></p>
@@ -61,7 +61,7 @@
 			<div class="modal-content pa-0">
 				<div id="carrusel" class="carousel carousel-slider">
 					<a v-for="(foto, idx) of actual.foto" class="carousel-item" :href="`#${idx}`">
-						<img :src="`/img/${foto}`">
+						<img :src="`/ntp/img/${foto}`">
 					</a>
 				</div>
 				<div style="padding: 0 10px" class="relative">
@@ -90,7 +90,7 @@
 			},
 			methods: {
 				reset: function() {
-					axios.get('/api/producto').then(function (lista) {
+					axios.get('/ntp/api/producto').then(function (lista) {
 						vm.productos = lista.data
 					})
 				},
@@ -104,7 +104,7 @@
 						this.reset()
 						return
 					}
-					axios.get('/api/producto/search', {
+					axios.get('/ntp/api/producto/search', {
 						params: {
 							name: this.busqueda,
 							page: this.pagina,

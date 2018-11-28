@@ -7,10 +7,10 @@ const { query } = require('./mysql')
 const app = express()
 const api = express.Router()
 
-app.use(express.static('public'))
+app.use('/ntp', express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-app.use('/api', api)
+app.use('/ntp/api', api)
 
 api.post('/producto', async (req, res) => {
 	const results = await query('INSERT INTO producto (nombre, descripcion, precio, estado) VALUES (?, ?, ?, ?)', [

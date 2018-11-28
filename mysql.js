@@ -3,8 +3,8 @@ const mysql = require('mysql')
 const conexion = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
-    user: 'javier',
-    password: 'javier',
+    user: 'ntp',
+    password: 'ntp',
     database: '2018ntpproyecto',
 })
 

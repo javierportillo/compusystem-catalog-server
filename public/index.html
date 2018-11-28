@@ -143,7 +143,7 @@
 					<td>{{ producto.descripcion }}</td>
 					<td>{{ producto.estado }}</td>
 					<td>
-						<img v-if="producto.foto && producto.foto.length" :src="`/img/${producto.foto[0]}`" style="width: 50px;">
+						<img v-if="producto.foto && producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" style="width: 50px;">
 					</td>
 					<td>
 						<button style="color: red;" @click="eliminar(idx, producto)">X</button>
@@ -175,22 +175,22 @@
 			products: [],
 		},
 		mounted: function () {
-			axios.get('/api/producto').then(function(lista) {
+			axios.get('/ntp/api/producto').then(function(lista) {
 				vm.products = lista.data
 			})
-			axios.get('/api/contacto').then(function (res) {
+			axios.get('/ntp/api/contacto').then(function (res) {
 				vm.contacto = res.data
 			})
 		},
 		methods: {
 			buscar: function() {
 				if (!vm.busqueda.nombre) {
-					axios.get('/api/producto').then(function(lista) {
+					axios.get('/ntp/api/producto').then(function(lista) {
 						vm.products = lista.data
 					})
 					return
 				}
-				axios.get('/api/producto/search', {
+				axios.get('/ntp/api/producto/search', {
 					params: {
 						name: vm.busqueda.nombre,
 					},
@@ -200,13 +200,13 @@
 				})
 			},
 			eliminar: function(idx, producto) {
-				axios.delete('/api/producto/' + producto.id).then(function (res) {
+				axios.delete('/ntp/api/producto/' + producto.id).then(function (res) {
 					if (!res.data.success) { return }
 					Vue.delete(vm.products, idx)
 				})
 			},
 			config: function () {
-				axios.post('/api/contacto', this.contacto).then(function (res) {
+				axios.post('/ntp/api/contacto', this.contacto).then(function (res) {
 					if (!res.data.success) {
 						alert('No se pudo actualizar los datos de contacto.')
 						return
@@ -220,7 +220,7 @@
 					|| !this.nuevo.descripcion
 					|| !this.nuevo.estado
 				) { return }
-				axios.post('/api/producto', this.nuevo).then(function (resCreate) {
+				axios.post('/ntp/api/producto', this.nuevo).then(function (resCreate) {
 					if (!resCreate.data.success) {
 						alert('No se pudo crear el producto.')
 					}
@@ -230,7 +230,7 @@
 					for (var i = 0; i < file.files.length; i++) {
 						formData.append('foto', file.files[i])
 					}
-					axios.post(`/api/producto/${resCreate.data.id}/foto`, formData, {
+					axios.post(`/ntp/api/producto/${resCreate.data.id}/foto`, formData, {
 						headers: {
 							'Content-Type': 'multipart/form-data',
 						},
