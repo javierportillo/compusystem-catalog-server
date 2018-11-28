@@ -14,8 +14,8 @@
 		body { background: #F0F0FF; }
 		.flex { display: flex; }
 		.column { flex-direction: column; }
-		.flex-0 { flex: 0 }
-		.flex-1 { flex: 1 }
+		.flex-0 { flex: 0 0 auto; }
+		.flex-1 { flex: 1; }
 		.mx-0 {
 			margin-left: 0;
 			margin-right: 0;
@@ -47,13 +47,18 @@
 			</div>
 		</div>
 		<div class="row flex-1 scroll-y-auto my-0 mx-0">
-			<ul class="collection my-0">
+			<ul v-if="productos.length" class="collection my-0">
 				<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
 					<img v-if="producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
 					<span class="title">{{ producto.nombre }}</span>
 					<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
 					<p><b>Estado: {{ producto.estado }}</b></p>
 					<p style="padding-top: 10px">{{ producto.descripcion }}</p>
+				</li>
+			</ul>
+			<ul v-else class="collection my-0">
+				<li class="collection-item">
+					<span class="title">Sin Resultados</span>
 				</li>
 			</ul>
 		</div>
@@ -111,7 +116,7 @@
 						},
 					}).then(function(lista) {
 						if (lista.data.success === false) { return }
-						lista.data.forEach(function (p) { vm.productos.push(p) })
+						vm.productos = lista.data
 					})
 				},
 				verFotos: function(producto) {
