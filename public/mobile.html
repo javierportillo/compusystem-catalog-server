@@ -78,6 +78,29 @@
 				</div>
 			</div>
 		</div>
+		<div class="fixed-action-btn">
+			<a class="btn-floating btn-large">
+				<i class="large material-icons">phone</i>
+			</a>
+			<ul>
+				<li v-if="contacto.telefono">
+					<a :href="`tel:${contacto.telefono}`" class="btn-floating grey darken-2">
+						<i class="material-icons">phone</i>
+					</a>
+				</li>
+				<li v-if="contacto.facebook">
+					<a :href="contacto.facebook" class="btn-floating light-blue darken-4">FB</a>
+				</li>
+				<li v-if="contacto.twitter">
+					<a :href="contacto.twitter" class="btn-floating light-blue">TW</a>
+				</li>
+				<li v-if="contacto.correo">
+					<a :href="`mailto:${contacto.correo}`" class="btn-floating red darken-1">
+						<i class="material-icons">email</i>
+					</a>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<script>
 		var vm = new Vue({
@@ -87,11 +110,26 @@
 				busqueda: '',
 				pagina: 0,
 				actual: {},
+				contacto: {
+					telefono: null,
+					facebook: null,
+					twitter: null,
+					correo: null,
+				}
 			},
 			mounted: function () {
 				this.reset()
 				var modal = document.getElementById('fotos')
 				var instances = M.Modal.init(modal)
+
+
+				axios.get('/ntp/api/contacto').then(function (res) {
+					vm.contacto = res.data
+					Vue.nextTick(function () {
+						var actionBtns = document.querySelectorAll('.fixed-action-btn')
+						var instances = M.FloatingActionButton.init(actionBtns)
+					})
+				})
 			},
 			methods: {
 				reset: function() {
