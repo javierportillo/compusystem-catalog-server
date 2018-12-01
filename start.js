@@ -28,7 +28,7 @@ function extension(name) {
 }
 
 const upload = multer({ dest: 'public/img/' })
-api.post('/producto/:id/foto', upload.array('foto', 4), async (req, res) => {
+api.post('/producto/:id/foto', upload.array('foto', 100), async (req, res) => {
 	const names = []
 	for(const file of req.files) {
 		const ext = extension(file.originalname)
