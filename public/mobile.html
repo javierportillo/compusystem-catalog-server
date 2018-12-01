@@ -41,6 +41,20 @@
 	<div id="app">
 		<div class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
 			<div class="row flex-0 mx-0 my-0">
+				<div style="display: flex; justify-content: space-evenly; width: 100%">
+					<a v-if="contacto.facebook" :href="contacto.facebook" class="waves-effect waves-light btn grey darken-2">
+						<i class="material-icons">phone</i>
+					</a>
+					<a v-if="contacto.telefono" :href="`tel:${contacto.telefono}`" class="waves-effect waves-light btn light-blue darken-4">
+						FB
+					</a>
+					<a v-if="contacto.twitter" :href="contacto.twitter" class="waves-effect waves-light btn light-blue">
+						TW
+					</a>
+					<a v-if="contacto.correo" :href="`mailto:${contacto.correo}`" class="waves-effect waves-light btn red darken-1">
+						<i class="material-icons">email</i>
+					</a>
+				</div>
 				<div class="input-field">
 					<i class="material-icons prefix" @click="search">search</i>
 					<input v-model="busqueda" type="text" id="busqueda" @keypress.enter="search">
@@ -79,20 +93,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div style="position: fixed; bottom: 0; display: flex; justify-content: space-evenly; width: 100%">
-			<a v-if="contacto.facebook" :href="contacto.facebook" class="waves-effect waves-light btn grey darken-2">
-				<i class="material-icons">phone</i>
-			</a>
-			<a v-if="contacto.telefono" :href="`tel:${contacto.telefono}`" class="waves-effect waves-light btn light-blue darken-4">
-				FB
-			</a>
-			<a v-if="contacto.twitter" :href="contacto.twitter" class="waves-effect waves-light btn light-blue">
-				TW
-			</a>
-			<a v-if="contacto.correo" :href="`mailto:${contacto.correo}`" class="waves-effect waves-light btn red darken-1">
-				<i class="material-icons">email</i>
-			</a>
 		</div>
 	</div>
 	<script>
