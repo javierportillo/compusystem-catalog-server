@@ -47,9 +47,9 @@
 			</div>
 		</div>
 		<div class="row flex-1 scroll-y-auto my-0 mx-0">
-			<ul v-if="productos.length" class="collection my-0">
+			<ul v-if="productos && productos.length" class="collection my-0">
 				<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
-					<img v-if="producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
+					<img v-if="producto.foto && producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
 					<span class="title">{{ producto.nombre }}</span>
 					<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
 					<p><b>Estado: {{ producto.estado }}</b></p>
