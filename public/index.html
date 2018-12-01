@@ -223,6 +223,7 @@
 				axios.post('/ntp/api/producto', this.nuevo).then(function (resCreate) {
 					if (!resCreate.data.success) {
 						alert('No se pudo crear el producto.')
+						return
 					}
 					var file = document.getElementById('foto')
 					if (!file.files.length) { return }
@@ -237,6 +238,7 @@
 					}).then(function (resFoto) {
 						if (!resFoto.data.success) {
 							alert('Hubo un problema al subir la foto del producto.')
+							return
 						}
 						vm.products.push({
 							id: resCreate.data.id,
