@@ -75,8 +75,10 @@ api.delete('/producto/:id', async (req, res) => {
 	])
 	if (!producto) { return }
 	const fotos = JSON.parse(producto.foto)
-	for (const foto of fotos) {
-		fs.unlink(`./public/img/${foto}`, () => {})
+	if (Array.isArray(fotos)) {
+		for (const foto of fotos) {
+			fs.unlink(`./public/img/${foto}`, () => {})
+		}
 	}
 	await query('DELETE FROM producto WHERE id = ?', [
 		req.params.id,
