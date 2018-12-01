@@ -38,43 +38,45 @@
 	</style>
 </head>
 <body>
-	<div id="app" class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
-		<div class="row flex-0 mx-0 my-0">
-			<div class="input-field">
-				<i class="material-icons prefix" @click="search">search</i>
-				<input v-model="busqueda" type="text" id="busqueda" @keypress.enter="search">
-				<label for="busqueda">Buscar</label>
-			</div>
-		</div>
-		<div class="row flex-1 scroll-y-auto my-0 mx-0">
-			<ul v-if="productos && productos.length" class="collection my-0">
-				<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
-					<img v-if="producto.foto && producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
-					<span class="title">{{ producto.nombre }}</span>
-					<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
-					<p><b>Estado: {{ producto.estado }}</b></p>
-					<p style="padding-top: 10px">{{ producto.descripcion }}</p>
-				</li>
-			</ul>
-			<ul v-else class="collection my-0">
-				<li class="collection-item">
-					<span class="title">Sin Resultados</span>
-				</li>
-			</ul>
-		</div>
-		<div id="fotos" class="modal bottom-sheet maxh-unset">
-			<div class="modal-content pa-0">
-				<div id="carrusel" class="carousel carousel-slider">
-					<a v-for="(foto, idx) of actual.foto" class="carousel-item" :href="`#${idx}`">
-						<img :src="`/ntp/img/${foto}`">
-					</a>
+	<div id="app">
+		<div class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
+			<div class="row flex-0 mx-0 my-0">
+				<div class="input-field">
+					<i class="material-icons prefix" @click="search">search</i>
+					<input v-model="busqueda" type="text" id="busqueda" @keypress.enter="search">
+					<label for="busqueda">Buscar</label>
 				</div>
-				<div style="padding: 0 10px" class="relative">
-					<button class="waves-effect waves-teal btn-flat absolute mr-1 right" @click="closeModal">x</button>
-					<h5>{{ actual.nombre }}</h5>
-					<h5>$ {{ Number(actual.precio).toFixed(2) }}</h5>
-					<p><b>Estado: {{ actual.estado }}</b></p>
-					<p>{{ actual.descripcion }}</p>
+			</div>
+			<div class="row flex-1 scroll-y-auto my-0 mx-0">
+				<ul v-if="productos && productos.length" class="collection my-0">
+					<li v-for="producto in productos" class="collection-item avatar" @click="verFotos(producto)">
+						<img v-if="producto.foto && producto.foto.length" :src="`/ntp/img/${producto.foto[0]}`" class="circle">
+						<span class="title">{{ producto.nombre }}</span>
+						<p><b>Precio: $ {{ Number(producto.precio).toFixed(2) }}</b></p>
+						<p><b>Estado: {{ producto.estado }}</b></p>
+						<p style="padding-top: 10px">{{ producto.descripcion }}</p>
+					</li>
+				</ul>
+				<ul v-else class="collection my-0">
+					<li class="collection-item">
+						<span class="title">Sin Resultados</span>
+					</li>
+				</ul>
+			</div>
+			<div id="fotos" class="modal bottom-sheet maxh-unset">
+				<div class="modal-content pa-0">
+					<div id="carrusel" class="carousel carousel-slider">
+						<a v-for="(foto, idx) of actual.foto" class="carousel-item" :href="`#${idx}`">
+							<img :src="`/ntp/img/${foto}`">
+						</a>
+					</div>
+					<div style="padding: 0 10px" class="relative">
+						<button class="waves-effect waves-teal btn-flat absolute mr-1 right" @click="closeModal">x</button>
+						<h5>{{ actual.nombre }}</h5>
+						<h5>$ {{ Number(actual.precio).toFixed(2) }}</h5>
+						<p><b>Estado: {{ actual.estado }}</b></p>
+						<p>{{ actual.descripcion }}</p>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -121,13 +123,13 @@
 				this.reset()
 				var modal = document.getElementById('fotos')
 				var instances = M.Modal.init(modal)
-
-
 				axios.get('/ntp/api/contacto').then(function (res) {
 					vm.contacto = res.data
 					Vue.nextTick(function () {
 						var actionBtns = document.querySelectorAll('.fixed-action-btn')
-						var instances = M.FloatingActionButton.init(actionBtns)
+						var instances = M.FloatingActionButton.init(actionBtns, {
+							hoverEnabled: false,
+						})
 					})
 				})
 			},
