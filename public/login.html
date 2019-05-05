@@ -49,7 +49,7 @@
 					<span v-if="usererror" class="helper-text red-text">{{ usererror }}</span>
 				</div>
 				<div class="input-field">
-					<input v-model="pass" type="text" id="pass" @keypress.enter="attempt" class="validate">
+					<input v-model="pass" type="password" id="pass" @keypress.enter="attempt" class="validate">
 					<label for="pass">Contraseña</label>
 					<span v-if="passerror" class="helper-text red-text">{{ passerror }}</span>
 				</div>
