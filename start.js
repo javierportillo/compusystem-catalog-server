@@ -1,16 +1,31 @@
 const fs = require('fs');
+const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
+const session = require('express-session')
 const multer = require('multer')
 const { query } = require('./mysql')
 
 const app = express()
 const api = express.Router()
 
+app.use(session({
+	secret: 'proyecto ntp',
+	resave: false,
+	saveUninitialized: true,
+	cookie: { secure: false },
+}))
 app.use('/ntp', express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use('/ntp/api', api)
+
+app.get('/ntp/index.html', (req, res) => {
+	if (!req.session.loggedin) {
+		return res.redirect('/ntp/login.html')
+	}
+	res.sendFile(path.join(__dirname, '/index.html'))
+})
 
 api.post('/producto', async (req, res) => {
 	const results = await query('INSERT INTO producto (nombre, descripcion, precio, estado) VALUES (?, ?, ?, ?)', [
@@ -52,8 +67,10 @@ api.get('/producto', async (req, res) => {
 
 api.get('/producto/search', async (req, res) => {
 	if (!req.query.name) { return res.json({ success: false }) }
-	const productos = await query('SELECT * FROM producto WHERE MATCH(nombre) AGAINST(?)', [
+	const productos = await query('SELECT * FROM producto WHERE MATCH(nombre) AGAINST(?) OR nombre LIKE ? OR descripcion LIKE ?', [
 		req.query.name,
+		`%${req.query.name}%`,
+		`%${req.query.name}%`,
 	])
 	res.json(productos.map((p) => {
 		p.foto = JSON.parse(p.foto)
@@ -107,6 +124,29 @@ api.post('/contacto', async (req, res) => {
 		twitter : req.body.twitter || null,
 		correo: req.body.correo || null,
 	})
+	res.json({ success: true })
+})
+
+api.post('/login', (req, res) => {
+	const { user, pass } = req.body
+	if (!user) {
+		return res.json({ success: false, field: 'user', error: 'Falta usuario' })
+	}
+	if (!pass) {
+		return res.json({ success: false, field: 'pass', error: 'Falta contraseña' })
+	}
+	if (user !== 'admin') {
+		return res.json({ success: false, field: 'user', error: 'Usuario no existe' })
+	}
+	if (pass !== 'admin') {
+		return res.json({ success: false, field: 'pass', error: 'Contraseña incorrecta' })
+	}
+	req.session.loggedin = true
+	res.json({ success: true })
+})
+
+api.post('/logout', (req, res) => {
+	req.session.destroy()
 	res.json({ success: true })
 })
 

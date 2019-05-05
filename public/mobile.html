@@ -5,56 +5,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Productos</title>
 	<link rel="stylesheet" href="materialize.css">
+	<link rel="stylesheet" href="style.css">
 	<link href="materialicons.css" rel="stylesheet">
 	<script src="materialize.js"></script>
 	<script src="axios.js"></script>
 	<script src="vue.js"></script>
-	<style>
-		html, body, #app { height: 100%; }
-		body { background: #F0F0FF; }
-		.flex { display: flex; }
-		.column { flex-direction: column; }
-		.flex-0 { flex: 0 0 auto; }
-		.flex-1 { flex: 1; }
-		.mx-0 {
-			margin-left: 0;
-			margin-right: 0;
-		}
-		.my-0 {
-			margin-top: 0;
-			margin-bottom: 0;
-		}
-		.mr-1 {
-			margin-right: 1rem;
-		}
-		.pa-0 {
-			padding: 0 !important;
-		}
-		.relative { position: relative; }
-		.absolute { position: absolute; }
-		.right { right: 0; }
-		.scroll-y-auto { overflow-y: auto; }
-		.maxh-unset { max-height: unset !important; }
-	</style>
 </head>
 <body>
 	<div id="app">
 		<div class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
 			<div class="row flex-0 mx-0 my-0">
-				<div style="text-align: center">
-					<a v-if="contacto.telefono" :href="`tel:${contacto.telefono}`" class="waves-effect waves-light btn grey darken-2">
-						<i class="material-icons">phone</i>
-					</a>
-					<a v-if="contacto.facebook" :href="contacto.facebook" class="waves-effect waves-light btn light-blue darken-4">
-						FB
-					</a>
-					<a v-if="contacto.twitter" :href="contacto.twitter" class="waves-effect waves-light btn light-blue">
-						TW
-					</a>
-					<a v-if="contacto.correo" :href="`mailto:${contacto.correo}`" class="waves-effect waves-light btn red darken-1">
-						<i class="material-icons">email</i>
-					</a>
-				</div>
 				<div class="input-field">
 					<i class="material-icons prefix" @click="search">search</i>
 					<input v-model="busqueda" type="text" id="busqueda" @keypress.enter="search">
@@ -94,6 +54,33 @@
 				</div>
 			</div>
 		</div>
+		<div class="fixed-action-btn">
+			<a class="btn-floating btn-large red">
+				<i class="large material-icons">contact_mail</i>
+			</a>
+			<ul>
+				<li>
+					<a v-if="contacto.twitter" :href="contacto.twitter" class="btn-floating light-blue">
+						<i class="material-icons">help</i>
+					</a>
+				</li>
+				<li>
+					<a v-if="contacto.telefono" :href="`tel:${contacto.telefono}`" class="btn-floating grey darken-2">
+						<i class="material-icons">phone</i>
+					</a>
+				</li>
+				<li>
+					<a v-if="contacto.facebook" :href="contacto.facebook" class="btn-floating light-blue darken-4">
+						FB
+					</a>
+				</li>
+				<li>
+					<a v-if="contacto.correo" :href="`mailto:${contacto.correo}`" class="btn-floating red darken-1">
+						<i class="material-icons">email</i>
+					</a>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<script>
 		var vm = new Vue({
@@ -114,6 +101,10 @@
 				this.reset()
 				var modal = document.getElementById('fotos')
 				var instances = M.Modal.init(modal)
+				var actionbtn_elems = document.getElementsByClassName('fixed-action-btn')
+				var actionbtn_instances = M.FloatingActionButton.init(actionbtn_elems, {
+					hoverEnabled: true,
+				})
 				axios.get('/ntp/api/contacto').then(function (res) {
 					vm.contacto = res.data
 					Vue.nextTick(function () {
@@ -148,6 +139,9 @@
 					}).then(function(lista) {
 						if (lista.data.success === false) { return }
 						vm.productos = lista.data
+						if (!lista.data.length) {
+							M.toast({ html: 'No se encontraron productos' })
+						}
 					})
 				},
 				verFotos: function(producto) {

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Log In</title>
+	<link rel="stylesheet" href="materialize.css">
+	<link rel="stylesheet" href="style.css">
+	<link href="materialicons.css" rel="stylesheet">
+	<script src="materialize.js"></script>
+	<script src="axios.js"></script>
+	<script src="vue.js"></script>
+	<style>
+		html, body, #app { height: 100%; }
+		body { background: #F0F0FF; }
+		.flex { display: flex; }
+		.column { flex-direction: column; }
+		.flex-0 { flex: 0 0 auto; }
+		.flex-1 { flex: 1; }
+		.mx-0 {
+			margin-left: 0;
+			margin-right: 0;
+		}
+		.my-0 {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+		.mr-1 {
+			margin-right: 1rem;
+		}
+		.pa-0 {
+			padding: 0 !important;
+		}
+		.relative { position: relative; }
+		.absolute { position: absolute; }
+		.right { right: 0; }
+		.scroll-y-auto { overflow-y: auto; }
+		.maxh-unset { max-height: unset !important; }
+	</style>
+</head>
+<body>
+	<div id="app">
+		<div class="container flex column" style="padding-top: 10px; padding-bottom: 20px;">
+			<div class="row flex-0 mx-0 my-0">
+				<h3>Inicia Session</h3>
+				<div class="input-field">
+					<input v-model="user" type="text" id="user" @keypress.enter="attempt" class="validate">
+					<label for="user">Usuario</label>
+					<span v-if="usererror" class="helper-text red-text">{{ usererror }}</span>
+				</div>
+				<div class="input-field">
+					<input v-model="pass" type="text" id="pass" @keypress.enter="attempt" class="validate">
+					<label for="pass">Contraseña</label>
+					<span v-if="passerror" class="helper-text red-text">{{ passerror }}</span>
+				</div>
+				<button class="btn" @click="attempt">Log In</button>
+			</div>
+		</div>
+	</div>
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				user: '',
+				pass: '',
+				usererror: '',
+				passerror: '',
+			},
+			methods: {
+				attempt: function () {
+					axios.post('/ntp/api/login', {
+						user: vm.user,
+						pass: vm.pass,
+					}).then(function (res) {
+						if (res.data.success === false) {
+							if (res.data.field === 'user') {
+								vm.usererror = res.data.error
+							}
+							if (res.data.field === 'pass') {
+								vm.passerror = res.data.error
+							}
+						} else {
+							window.location.href = '/ntp/index.html'
+						}
+					})
+				}
+			},
+		})
+	</script>
+</body>
+</html>

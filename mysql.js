@@ -10,7 +10,7 @@ const conexion = mysql.createPool({
 
 conexion.on('connection', () => {
     console.log('************************')
-    console.log('Conexion exitosa a MySQL BD Call Center')
+    console.log('Conexion exitosa a MySQL BD')
     console.log('************************')
 })
 

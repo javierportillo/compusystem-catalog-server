@@ -4,8 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<script src="axios.js"></script>
-	<script src="vue.js"></script>
+	<script src="/ntp/axios.js"></script>
+	<script src="/ntp/vue.js"></script>
 	<title>Catálogo</title>
 	<style>
 		body {
@@ -51,10 +51,16 @@
 			width: 100%;
 			background: white;
 		}
+		.logoutbtn {
+			position: fixed;
+			top: 15px;
+			right: 15px;
+		}
 	</style>
 </head>
 <body>
 <div id="app">
+	<button class="logoutbtn" @click="logout">Logout</button>
 	<form class="formulario" @submit.prevent="config">
 		<fieldset>
 			<legend>Detalles de Contacto</legend>
@@ -67,13 +73,13 @@
 				<input v-model="contacto.facebook" type="text" id="facebook">
 			</div>
 			<div class="control">
-				<label for="twitter">Twitter</label>
-				<input v-model="contacto.twitter" type="text" id="twitter">
-			</div>
-			<div class="control">
 				<label for="correo">Correo</label>
 				<input v-model="contacto.correo" type="text" id="correo">
 			</div>
+			<div class="control">
+					<label for="twitter">Doc. Ayuda</label>
+					<input v-model="contacto.twitter" type="text" id="twitter">
+				</div>
 			<div class="control">
 				<input type="submit" value="Cambiar">
 			</div>
@@ -197,12 +203,20 @@
 				}).then(function(lista) {
 					if (lista.data.success === false) { return }
 					vm.products = lista.data
+					if (!lista.data.length) {
+						setTimeout(() => alert('No se encontraron productos'), 200)
+					}
 				})
 			},
 			eliminar: function(idx, producto) {
+				if (!confirm('Estás seguro de eliminar este producto?')) { return }
 				axios.delete('/ntp/api/producto/' + producto.id).then(function (res) {
-					if (!res.data.success) { return }
+					if (!res.data.success) {
+						alert('No pudo ser eliminado')
+						return
+					}
 					Vue.delete(vm.products, idx)
+					setTimeout(() => alert('Producto eliminado exitosamente'), 200)
 				})
 			},
 			config: function () {
@@ -253,7 +267,13 @@
 						vm.nuevo.descripcion = ''
 						var file = document.getElementById('foto')
 						file.value = ''
+						setTimeout(() => alert('Producto creado exitosamente'), 200)
 					})
+				})
+			},
+			logout: function() {
+				axios.post('/ntp/api/logout').then(function (res) {
+					window.location.href = '/ntp/login.html'
 				})
 			},
 		},
